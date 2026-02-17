@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../MatchMaker.Application/MatchMaker.Application.csproj" />
+  <Project Path="../MatchMaker.Domain/MatchMaker.Domain.csproj" />
+  <Project Path="../MatchMaker.Infrastructure/MatchMaker.Infrastructure.csproj" />
+  <Project Path="MatchMaker.csproj" />
+</Solution>

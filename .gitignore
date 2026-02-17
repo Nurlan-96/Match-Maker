@@ -1,0 +1,39 @@
+# ===============================
+# .NET build outputs
+# ===============================
+**/bin/
+**/obj/
+
+# ===============================
+# Configuration files
+# ===============================
+# App settings (all environments)
+**/appsettings.json
+**/appsettings.*.json
+
+# Environment variables
+.env
+.env.*
+**/.env
+**/.env.*
+
+# ===============================
+# User-specific / IDE files
+# ===============================
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# ===============================
+# OS files
+# ===============================
+.DS_Store
+Thumbs.db
