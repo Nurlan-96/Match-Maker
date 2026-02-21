@@ -2,5 +2,6 @@
   <Project Path="../MatchMaker.Application/MatchMaker.Application.csproj" />
   <Project Path="../MatchMaker.Domain/MatchMaker.Domain.csproj" />
   <Project Path="../MatchMaker.Infrastructure/MatchMaker.Infrastructure.csproj" />
+  <Project Path="../MatchMaker.Shared/MatchMaker.Shared.csproj" Id="b03b808a-e7cf-4eb8-8e6c-f67344335837" />
   <Project Path="MatchMaker.csproj" />
 </Solution>
