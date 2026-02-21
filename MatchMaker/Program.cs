@@ -1,13 +1,16 @@
 using MatchMaker.Application.Auth;
 using MatchMaker.Application.Services.User;
+using MatchMaker.Application.Validation.User;
 using MatchMaker.Infrastructure.Auth;
 using MatchMaker.Infrastructure.Data;
 using MatchMaker.Infrastructure.Identity;
 using MatchMaker.Infrastructure.Services.Auth;
+using MatchMaker.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using FluentValidation;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,12 +26,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("Default")
     ));
 
-
+builder.Services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddHttpContextAccessor();
+
 
 builder.Services
-    .AddIdentityCore<ApplicationUser>()
+    .AddIdentityCore<ApplicationUser>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 8;
+    })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
