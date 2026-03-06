@@ -10,7 +10,7 @@ namespace MatchMaker.Infrastructure.Services.Auth
 ) : IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IUserProfileService _profileService;
+        private readonly IUserProfileService _profileService = profileService;
         private readonly IJwtTokenService _jwt = jwt;
         public async Task RegisterAsync(RegisterUserCommand command)
         {
@@ -23,17 +23,12 @@ namespace MatchMaker.Infrastructure.Services.Auth
                 Email = command.Email
             };
 
-            var result = await _userManager.CreateAsync(
-                user,
-                command.Password
-            );
+            var result = await _userManager.CreateAsync(user, command.Password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException(
                     string.Join("; ", result.Errors.Select(e => e.Description))
                 );
-
-            await _profileService.CreateProfileAsync(user.Id);
         }
 
         public async Task<string> LoginAsync(LoginUserCommand command)
