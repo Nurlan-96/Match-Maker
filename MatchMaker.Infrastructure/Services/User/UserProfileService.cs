@@ -35,8 +35,8 @@ namespace MatchMaker.Infrastructure.Services.User
         }
 
         public async Task AddMediaAsync(
-    Guid userId,
-    AddUserMediaCommand command)
+        Guid userId,
+        AddUserMediaCommand command)
         {
             var media = await _context.MediaEntities
                 .FirstOrDefaultAsync(m =>
@@ -59,11 +59,11 @@ namespace MatchMaker.Infrastructure.Services.User
 
             var count = await _context.UserMediaRanks
                 .CountAsync(x =>
-    x.UserId == userId &&
-    _context.MediaEntities
-        .Where(m => m.Category == command.Category)
-        .Select(m => m.Id)
-        .Contains(x.MediaId));
+                x.UserId == userId &&
+            _context.MediaEntities
+            .Where(m => m.Category == command.Category)
+            .Select(m => m.Id)
+            .Contains(x.MediaId));
 
             if (count >= 10)
                 throw new InvalidOperationException(
