@@ -15,17 +15,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Default")
-    ));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+// Application services
 builder.Services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -33,8 +30,13 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddHttpContextAccessor();
 
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Identity
 builder.Services
-    .AddIdentityCore<ApplicationUser>(options =>
+    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
         options.Password.RequireDigit = true;
         options.Password.RequireUppercase = true;
@@ -42,10 +44,10 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequiredLength = 8;
     })
-    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+// JWT Authentication
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -63,15 +65,16 @@ builder.Services
             )
         };
     });
-builder.Services.AddAuthorization();
 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();   
 }
 
 app.UseHttpsRedirection();
