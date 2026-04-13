@@ -18,7 +18,7 @@ namespace MatchMaker.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginUserCommand command)
         {
-            var token = await _authService.LoginAsync(command);
+             var token = await _authService.LoginAsync(command);
             return Ok(new { token });
         }
 
