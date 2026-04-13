@@ -5,7 +5,7 @@ namespace MatchMaker.Domain.Entities
     
         public class MediaEntity
         {
-            public int Id { get; set; }
+            public Guid Id { get; set; }
 
             // External API ID (IMDb, Google Books, Spotify)
             public string ExternalId { get; set; } = null!;
