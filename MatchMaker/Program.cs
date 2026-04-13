@@ -1,16 +1,19 @@
+using FluentValidation;
 using MatchMaker.Application.Auth;
+using MatchMaker.Application.Services.Media;
 using MatchMaker.Application.Services.User;
 using MatchMaker.Application.Validation.User;
 using MatchMaker.Infrastructure.Auth;
 using MatchMaker.Infrastructure.Data;
 using MatchMaker.Infrastructure.Identity;
 using MatchMaker.Infrastructure.Services.Auth;
+using MatchMaker.Infrastructure.Services.Media;
 using MatchMaker.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using FluentValidation;
+using Microsoft.OpenApi;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,12 +30,30 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginUserCommandValidator>(
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddHttpClient<MovieMediaProvider>();
+builder.Services.AddScoped<IMediaProvider, MovieMediaProvider>();
+builder.Services.AddScoped<IMediaProviderFactory, MediaProviderFactory>();
+builder.Services.AddHttpClient<MusicArtistMediaProvider>();
+builder.Services.AddScoped<IMediaProvider>(sp => sp.GetRequiredService<MovieMediaProvider>());
+builder.Services.AddScoped<IMediaProvider>(sp => sp.GetRequiredService<MusicArtistMediaProvider>());
 builder.Services.AddHttpContextAccessor();
-
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("bearer", document)] = []
+    });
+});
 
 // Identity
 builder.Services
@@ -49,7 +70,12 @@ builder.Services
 
 // JWT Authentication
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -74,7 +100,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();   
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
