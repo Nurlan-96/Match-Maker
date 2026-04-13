@@ -3,8 +3,8 @@
     public enum MediaCategory
     {
         Music,
-        Movies,
         Books,
-        Shows
+        Shows,
+        Movies
     }
 }
